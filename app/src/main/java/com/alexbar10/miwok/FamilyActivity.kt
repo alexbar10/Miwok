@@ -2,13 +2,13 @@ package com.alexbar10.miwok
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import kotlinx.android.synthetic.main.activity_family.*
+import kotlinx.android.synthetic.main.word_list.*
 
 class FamilyActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_family)
+        setContentView(R.layout.word_list)
 
         val familyWords: MutableList<Word> = arrayListOf(
             Word("father", "әpә"),
@@ -22,6 +22,6 @@ class FamilyActivity : AppCompatActivity() {
         )
 
         val adapter = WordAdapter(this, R.layout.list_item, familyWords)
-        list_view_family.adapter = adapter
+        list_view.adapter = adapter
     }
 }
