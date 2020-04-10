@@ -2,6 +2,7 @@ package com.alexbar10.miwok
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import kotlinx.android.synthetic.main.list_item.*
 import kotlinx.android.synthetic.main.word_list.*
 
 class NumbersActivity : AppCompatActivity() {
@@ -12,19 +13,19 @@ class NumbersActivity : AppCompatActivity() {
 
         // Array of numbers
         val numbers: MutableList<Word> = arrayListOf(
-            Word("one", "lutti"),
-            Word("two", "otiiko"),
-            Word("three", "tolookosu"),
-            Word("four", "oyyisa"),
-            Word("five", "massokka"),
-            Word("six", "temmokka"),
-            Word("seven", "kenekaku"),
-            Word("eight", "kawinta"),
-            Word("nine", "wo’e"),
-            Word("ten", "na’aacha")
+            Word("one", "lutti", R.drawable.number_one),
+            Word("two", "otiiko", R.drawable.number_two),
+            Word("three", "tolookosu", R.drawable.number_three),
+            Word("four", "oyyisa", R.drawable.number_four),
+            Word("five", "massokka", R.drawable.number_five),
+            Word("six", "temmokka", R.drawable.number_six),
+            Word("seven", "kenekaku", R.drawable.number_seven),
+            Word("eight", "kawinta", R.drawable.number_eight),
+            Word("nine", "wo’e", R.drawable.number_nine),
+            Word("ten", "na’aacha", R.drawable.number_ten)
         )
 
-        val adapter = WordAdapter(this, R.layout.list_item, numbers)
+        val adapter = WordAdapter(this, R.layout.list_item, numbers, R.color.category_numbers)
         list_view.adapter = adapter
 
         // Create views and add it to the root view

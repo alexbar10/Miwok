@@ -11,17 +11,17 @@ class FamilyActivity : AppCompatActivity() {
         setContentView(R.layout.word_list)
 
         val familyWords: MutableList<Word> = arrayListOf(
-            Word("father", "әpә"),
-            Word("mother", "әṭa"),
-            Word("son", "angsi"),
-            Word("daughter", "tune"),
-            Word("older brother", "taachi"),
-            Word("younger brother", "chalitti"),
-            Word("older sister", "teṭe"),
-            Word("younger sister", "kolliti")
+            Word("father", "әpә", R.drawable.family_father),
+            Word("mother", "әṭa", R.drawable.family_mother),
+            Word("son", "angsi", R.drawable.family_son),
+            Word("daughter", "tune", R.drawable.family_daughter),
+            Word("older brother", "taachi", R.drawable.family_older_brother),
+            Word("younger brother", "chalitti", R.drawable.family_younger_brother),
+            Word("older sister", "teṭe", R.drawable.family_older_sister),
+            Word("younger sister", "kolliti", R.drawable.family_younger_sister)
         )
 
-        val adapter = WordAdapter(this, R.layout.list_item, familyWords)
+        val adapter = WordAdapter(this, R.layout.list_item, familyWords, R.color.category_family)
         list_view.adapter = adapter
     }
 }

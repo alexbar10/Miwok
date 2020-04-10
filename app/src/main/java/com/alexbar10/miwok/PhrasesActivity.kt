@@ -11,7 +11,7 @@ class PhrasesActivity : AppCompatActivity() {
         setContentView(R.layout.word_list)
 
         val phrases: MutableList<Word> = arrayListOf(
-            Word("Where are you going?", "minto wuksus\n"),
+            Word("Where are you going?", "minto wuksus"),
             Word("What is your name?", "tinnә oyaase'nә"),
             Word("My name is..", "oyaaset..."),
             Word("How are you feeling?", "michәksәs?"),
@@ -21,7 +21,7 @@ class PhrasesActivity : AppCompatActivity() {
             Word("Let’s go.", "әәnәm")
         )
 
-        val adapter = WordAdapter(this, R.layout.list_item, phrases)
+        val adapter = WordAdapter(this, R.layout.list_item, phrases, R.color.category_phrases)
         list_view.adapter = adapter
     }
 }
