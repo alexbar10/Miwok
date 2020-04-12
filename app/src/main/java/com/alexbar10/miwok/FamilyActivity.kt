@@ -3,6 +3,7 @@ package com.alexbar10.miwok
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import kotlinx.android.synthetic.main.word_list.*
 
 class FamilyActivity : AppCompatActivity() {
@@ -12,6 +13,8 @@ class FamilyActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.word_list)
+
+        Log.d("Family activity", "onCreated")
 
         val familyWords: MutableList<Word> = arrayListOf(
             Word("father", "әpә", R.drawable.family_father, R.raw.family_father),
@@ -28,14 +31,56 @@ class FamilyActivity : AppCompatActivity() {
         list_view.adapter = adapter
 
         list_view.setOnItemClickListener { parent, view, position, id ->
+            // Delete other instance of media player if there's one
+            releaseHelper()
+
             // Get the item selected
             val wordSelected = parent.getItemAtPosition(position) as? Word
+
+            Log.d("Word Selected", wordSelected.toString())
 
             // Create media player
             wordSelected?.soundResourceId?.let {
                 mediaPlayer = MediaPlayer.create(this, it)
                 mediaPlayer?.start()
+                mediaPlayer?.setOnCompletionListener {
+                    releaseHelper()
+                }
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d("Family activity", "onStart")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("Family activity", "onResume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("Family activity", "onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("Family activity", "onStop")
+
+        releaseHelper()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("Family activity", "onDestroy")
+    }
+
+    private fun releaseHelper() {
+        if (mediaPlayer != null) {
+            mediaPlayer?.release()
+            mediaPlayer = null
         }
     }
 }

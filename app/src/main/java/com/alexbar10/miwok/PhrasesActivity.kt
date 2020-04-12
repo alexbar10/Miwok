@@ -28,6 +28,9 @@ class PhrasesActivity : AppCompatActivity() {
         list_view.adapter = adapter
 
         list_view.setOnItemClickListener { parent, view, position, id ->
+            // Delete other instance of media player if there's one
+            releaseHelper()
+
             // Get the item selected
             val wordSelected = parent.getItemAtPosition(position) as? Word
 
@@ -36,6 +39,18 @@ class PhrasesActivity : AppCompatActivity() {
                 mediaPlayer = MediaPlayer.create(this, it)
                 mediaPlayer?.start()
             }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        releaseHelper()
+    }
+
+    private fun releaseHelper() {
+        if (mediaPlayer != null) {
+            mediaPlayer?.release()
+            mediaPlayer = null
         }
     }
 }
