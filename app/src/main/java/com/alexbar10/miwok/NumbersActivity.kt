@@ -25,6 +25,8 @@ class NumbersActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeList
         super.onCreate(savedInstanceState)
         setContentView(R.layout.word_list)
 
+
+
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager?
 
         // Array of numbers
