@@ -6,28 +6,34 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.RequiresApi
-import kotlinx.android.synthetic.main.list_item.*
 import kotlinx.android.synthetic.main.word_list.*
+import kotlinx.android.synthetic.main.word_list.view.*
 
-class NumbersActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListener  {
+/**
+ * A simple [Fragment] subclass.
+ */
+class NumbersFragment : Fragment(), AudioManager.OnAudioFocusChangeListener {
 
     var mediaPlayer: MediaPlayer? = null
     var audioManager: AudioManager? = null
     var focusRequest: AudioFocusRequest? = null
     var playbackAttributes: AudioAttributes? = null
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.word_list)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val rootView = inflater.inflate(R.layout.word_list, container, false)
 
-
-
-        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+        audioManager = activity!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
 
         // Array of numbers
         val numbers: MutableList<Word> = arrayListOf(
@@ -43,10 +49,10 @@ class NumbersActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeList
             Word("ten", "na’aacha", R.drawable.number_ten, R.raw.number_ten)
         )
 
-        val adapter = WordAdapter(this, R.layout.list_item, numbers, R.color.category_numbers)
-        list_view.adapter = adapter
+        val adapter = WordAdapter(activity!!, R.layout.list_item, numbers, R.color.category_numbers)
+        rootView.list_view.adapter = adapter
 
-        list_view.setOnItemClickListener { parent, view, position, id ->
+        rootView.list_view.setOnItemClickListener { parent, _, position, _ ->
             // Delete other instance of media player if there's one
             releaseHelper()
 
@@ -54,27 +60,22 @@ class NumbersActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeList
             val wordSelected = parent.getItemAtPosition(position) as? Word
 
             // Request focus
-            setupManager(wordSelected)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                setupManager(wordSelected)
+            }
         }
-        // Create views and add it to the root view
-  /*      var index = 0
-        while (index < numbers.size) {
-            val textView = TextView(this)
-            textView.text = numbers[index]
-            linear_layout.addView(textView)
 
-            index++
-        }
-*/
-        /*
-        for (number in numbers) {
-            val textView = TextView(this)
-            textView.text = number
-            linear_layout.addView(textView)
-        }
-        */
+        return rootView
     }
 
+    override fun onStop() {
+        super.onStop()
+        releaseHelper()
+    }
+
+    /**
+     * Helper methods
+     */
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun setupManager(wordSelected: Word?) {
         playbackAttributes = AudioAttributes.Builder()
@@ -96,7 +97,7 @@ class NumbersActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeList
 
                     // Create media player
                     wordSelected?.soundResourceId?.let {
-                        mediaPlayer = MediaPlayer.create(this, it)
+                        mediaPlayer = MediaPlayer.create(activity, it)
                         mediaPlayer?.start()
                         mediaPlayer?.setOnCompletionListener {
                             releaseHelper()
@@ -109,11 +110,6 @@ class NumbersActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeList
                 }
             }
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        releaseHelper()
     }
 
     private fun releaseHelper() {

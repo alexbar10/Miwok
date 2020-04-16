@@ -8,39 +8,47 @@ import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.word_list.*
+import kotlinx.android.synthetic.main.word_list.view.*
 
-class ColorsActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListener  {
+/**
+ * A simple [Fragment] subclass.
+ */
+class PhrasesFragment : Fragment(), AudioManager.OnAudioFocusChangeListener {
 
     var mediaPlayer: MediaPlayer? = null
     var audioManager: AudioManager? = null
     var focusRequest: AudioFocusRequest? = null
     var playbackAttributes: AudioAttributes? = null
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.word_list)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val rootView = inflater.inflate(R.layout.word_list, container, false)
 
-        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+        audioManager = activity!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
 
-        val numbers: MutableList<Word> = arrayListOf(
-            Word("red", "weṭeṭṭi", R.drawable.color_red, R.raw.color_red),
-            Word("green", "chokokki", R.drawable.color_green, R.raw.color_green),
-            Word("brown", "ṭakaakki", R.drawable.color_brown, R.raw.color_brown),
-            Word("gray", "ṭopoppi", R.drawable.color_gray, R.raw.color_gray),
-            Word("black", "kululli", R.drawable.color_black, R.raw.color_black),
-            Word("white", "kelelli", R.drawable.color_white, R.raw.color_white),
-            Word("dusty yellow", "ṭopiisә", R.drawable.color_dusty_yellow, R.raw.color_dusty_yellow),
-            Word("mustard yellow", "chiwiiṭә", R.drawable.color_mustard_yellow, R.raw.color_mustard_yellow)
+        val phrases: MutableList<Word> = arrayListOf(
+            Word("Where are you going?", "minto wuksus", null, R.raw.phrase_where_are_you_going),
+            Word("What is your name?", "tinnә oyaase'nә", null, R.raw.phrase_what_is_your_name),
+            Word("My name is..", "oyaaset...", null, R.raw.phrase_my_name_is),
+            Word("How are you feeling?", "michәksәs?", null, R.raw.phrase_how_are_you_feeling),
+            Word("I’m feeling good.", "kuchi achit", null, R.raw.phrase_im_feeling_good),
+            Word("Are you coming?", "әәnәs'aa?", null, R.raw.phrase_are_you_coming),
+            Word("Yes, I’m coming.", "hәә’ әәnәm", null, R.raw.phrase_yes_im_coming),
+            Word("Let’s go.", "әәnәm", null, R.raw.phrase_lets_go)
         )
 
-        val adapter = WordAdapter(this, R.layout.list_item, numbers, R.color.category_colors)
-        list_view.adapter = adapter
+        val adapter = WordAdapter(activity!!, R.layout.list_item, phrases, R.color.category_phrases)
+        rootView.list_view.adapter = adapter
 
-        list_view.setOnItemClickListener { parent, view, position, id ->
+        rootView.list_view.setOnItemClickListener { parent, _, position, _ ->
             // Delete other instance of media player if there's one
             releaseHelper()
 
@@ -48,10 +56,22 @@ class ColorsActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
             val wordSelected = parent.getItemAtPosition(position) as? Word
 
             // Request focus
-            setupManager(wordSelected)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                setupManager(wordSelected)
+            }
         }
+
+        return rootView
     }
 
+    override fun onStop() {
+        super.onStop()
+        releaseHelper()
+    }
+
+    /**
+     * Helper methods
+     */
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun setupManager(wordSelected: Word?) {
         playbackAttributes = AudioAttributes.Builder()
@@ -73,7 +93,7 @@ class ColorsActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
                     // Create media player
                     wordSelected?.soundResourceId?.let {
-                        mediaPlayer = MediaPlayer.create(this, it)
+                        mediaPlayer = MediaPlayer.create(activity, it)
                         mediaPlayer?.start()
                         mediaPlayer?.setOnCompletionListener {
                             releaseHelper()
@@ -88,18 +108,13 @@ class ColorsActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        releaseHelper()
-    }
-
     private fun releaseHelper() {
         if (mediaPlayer != null) {
             mediaPlayer?.release()
             mediaPlayer = null
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                focusRequest?.let {  audioManager?.abandonAudioFocusRequest(it) }
+                focusRequest?.let { audioManager?.abandonAudioFocusRequest(it) }
             }
         }
     }

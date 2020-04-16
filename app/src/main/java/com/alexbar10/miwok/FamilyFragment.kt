@@ -6,41 +6,50 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.RequiresApi
-import kotlinx.android.synthetic.main.word_list.*
+import kotlinx.android.synthetic.main.word_list.view.*
 
-class PhrasesActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListener {
+/**
+ * A simple [Fragment] subclass.
+ */
+class FamilyFragment : Fragment(), AudioManager.OnAudioFocusChangeListener {
 
     var mediaPlayer: MediaPlayer? = null
     var audioManager: AudioManager? = null
     var focusRequest: AudioFocusRequest? = null
     var playbackAttributes: AudioAttributes? = null
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.word_list)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val rootView = inflater.inflate(R.layout.word_list, container, false)
 
-        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+        audioManager = activity!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
 
-        val phrases: MutableList<Word> = arrayListOf(
-            Word("Where are you going?", "minto wuksus", null, R.raw.phrase_where_are_you_going),
-            Word("What is your name?", "tinnә oyaase'nә", null, R.raw.phrase_what_is_your_name),
-            Word("My name is..", "oyaaset...", null, R.raw.phrase_my_name_is),
-            Word("How are you feeling?", "michәksәs?", null, R.raw.phrase_how_are_you_feeling),
-            Word("I’m feeling good.", "kuchi achit", null, R.raw.phrase_im_feeling_good),
-            Word("Are you coming?", "әәnәs'aa?", null, R.raw.phrase_are_you_coming),
-            Word("Yes, I’m coming.", "hәә’ әәnәm", null, R.raw.phrase_yes_im_coming),
-            Word("Let’s go.", "әәnәm", null, R.raw.phrase_lets_go)
+
+        val familyWords: MutableList<Word> = arrayListOf(
+            Word("father", "әpә", R.drawable.family_father, R.raw.family_father),
+            Word("mother", "әṭa", R.drawable.family_mother, R.raw.family_mother),
+            Word("son", "angsi", R.drawable.family_son, R.raw.family_son),
+            Word("daughter", "tune", R.drawable.family_daughter, R.raw.family_daughter),
+            Word("older brother", "taachi", R.drawable.family_older_brother, R.raw.family_older_brother),
+            Word("younger brother", "chalitti", R.drawable.family_younger_brother, R.raw.family_younger_brother),
+            Word("older sister", "teṭe", R.drawable.family_older_sister, R.raw.family_older_sister),
+            Word("younger sister", "kolliti", R.drawable.family_younger_sister, R.raw.family_younger_sister)
         )
 
-        val adapter = WordAdapter(this, R.layout.list_item, phrases, R.color.category_phrases)
-        list_view.adapter = adapter
+        val adapter = WordAdapter(activity!!, R.layout.list_item, familyWords, R.color.category_family)
+        rootView.list_view.adapter = adapter
 
-        list_view.setOnItemClickListener { parent, view, position, id ->
+        rootView.list_view.setOnItemClickListener { parent, _, position, _ ->
             // Delete other instance of media player if there's one
             releaseHelper()
 
@@ -48,10 +57,22 @@ class PhrasesActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeList
             val wordSelected = parent.getItemAtPosition(position) as? Word
 
             // Request focus
-            setupManager(wordSelected)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                setupManager(wordSelected)
+            }
         }
+
+        return rootView
     }
 
+    override fun onStop() {
+        super.onStop()
+        releaseHelper()
+    }
+
+    /**
+     * Helper methods
+     */
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun setupManager(wordSelected: Word?) {
         playbackAttributes = AudioAttributes.Builder()
@@ -73,7 +94,7 @@ class PhrasesActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeList
 
                     // Create media player
                     wordSelected?.soundResourceId?.let {
-                        mediaPlayer = MediaPlayer.create(this, it)
+                        mediaPlayer = MediaPlayer.create(activity, it)
                         mediaPlayer?.start()
                         mediaPlayer?.setOnCompletionListener {
                             releaseHelper()
@@ -86,11 +107,6 @@ class PhrasesActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeList
                 }
             }
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        releaseHelper()
     }
 
     private fun releaseHelper() {

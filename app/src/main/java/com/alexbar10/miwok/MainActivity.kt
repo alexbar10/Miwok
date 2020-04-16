@@ -12,6 +12,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        view_pager.adapter = MiwokFragmentAdapter(supportFragmentManager)
+/*
         numbers.setOnClickListener {
             startActivity(Intent(this, NumbersActivity::class.java))
         }
@@ -23,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         }
         phrases.setOnClickListener {
             startActivity(Intent(this, PhrasesActivity::class.java))
-
         }
+        */
     }
 }
