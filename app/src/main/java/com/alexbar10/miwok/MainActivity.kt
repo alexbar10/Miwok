@@ -12,7 +12,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        view_pager.adapter = MiwokFragmentAdapter(supportFragmentManager)
+        view_pager.adapter = MiwokFragmentAdapter(this, supportFragmentManager)
+        tabs.setupWithViewPager(view_pager)
 /*
         numbers.setOnClickListener {
             startActivity(Intent(this, NumbersActivity::class.java))
